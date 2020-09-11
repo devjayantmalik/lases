@@ -65,8 +65,8 @@ const registerNewUser = async (user) => {
 
   // Create User object
   const userObject = userRecord.toObject();
-  Reflect.deleteProperty(u, "password");
-  Reflect.deleteProperty(u, "tokens");
+  Reflect.deleteProperty(userObject, "password");
+  Reflect.deleteProperty(userObject, "tokens");
 
   // Generate Auth Token
   const token = getToken(userObject);

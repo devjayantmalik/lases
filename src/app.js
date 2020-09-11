@@ -3,6 +3,8 @@ const bodyParser = require("body-parser");
 const routers = require("./routers");
 const config = require("./config");
 const { errors } = require("celebrate");
+const cors = require("cors");
+const helmet = require("helmet");
 
 // Connect to database
 require("./config/db")();
@@ -11,6 +13,10 @@ const app = express();
 
 // Configure Middlewares
 app.use(bodyParser.json());
+app.use(cors());
+app.use(helmet());
+
+// Setup api routes
 app.use("/api", routers());
 
 // Configure 404 Routes
