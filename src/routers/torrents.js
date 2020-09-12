@@ -2,7 +2,7 @@ const middlewares = require("../middlewares");
 const { Router } = require("express");
 const torrentService = require("../services/torrent");
 const { celebrate, Joi } = require("celebrate");
-const CustomError = require("../utils/error");
+const lowdb = require("../config/lowdb");
 
 const router = Router();
 
@@ -19,7 +19,9 @@ module.exports = (app) => {
     middlewares.attachUserTorrents,
     async (req, res, next) => {
       try {
-        return res.status(200).send(req.torrents).end();
+        const pending = [lowdb.get(req.currentUser._id)] || [];
+        const completed = req.torrents;
+        return res.status(200).send({ completed, pending }).end();
       } catch (err) {
         return next(err);
       }
@@ -33,8 +35,7 @@ module.exports = (app) => {
     "/",
     celebrate({
       body: Joi.object({
-        magnet: Joi.string(),
-        fileUrl: Joi.string(),
+        magnet: Joi.string().required(),
       }),
     }),
     middlewares.isAuth,
@@ -42,15 +43,8 @@ module.exports = (app) => {
     async (req, res, next) => {
       try {
         const user = req.currentUser;
-        const { magnet, fileUrl } = req.body;
-        if (!magnet && !fileUrl) {
-          throw CustomError(
-            "Please provide Magnet or .torrent file url.",
-            400,
-            "TorrentValidationError"
-          );
-        }
-        const info = torrentService.getTorrentInfo(fileUrl, magnet);
+        const { magnet } = req.body;
+        const info = await torrentService.getTorrentInfo(magnet);
         const { torrent, alreadyExists } = await torrentService.addTorrent(
           user,
           info

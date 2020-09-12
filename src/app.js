@@ -5,8 +5,6 @@ const config = require("./config");
 const { errors } = require("celebrate");
 const cors = require("cors");
 const helmet = require("helmet");
-const io = require("socket.io");
-const http = require("http");
 
 // Connect to database
 require("./config/db")();
@@ -39,16 +37,6 @@ app.use((err, req, res, next) => {
     .status(err.status || 500)
     .json({ name: err.name, message: err.message, status: err.status })
     .end();
-});
-
-// Initialize socket io instance
-const server = http.createServer(app);
-const socket = io(server);
-
-socket.on("connection", (client) => {
-  setInterval(() => {
-    client.emit("progress", "Testing...");
-  }, 1000);
 });
 
 app.listen(config.port, () => {
