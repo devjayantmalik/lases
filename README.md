@@ -2,6 +2,8 @@
 
 Application for torrent downloading
 
+> Authentication Works Great but other parts such as torrent related stuff doesn't work!.
+
 ## Authentication Routes
 
 > All routes needd to start with /api, if you are accessing the api
